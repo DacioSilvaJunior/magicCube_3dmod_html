@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Cubo Mágico Three.js</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://unpkg.com/three@0.165.0/build/three.module.js",
+        "three/addons/":"https://unpkg.com/three@0.165.0/examples/jsm/"
+    }
+}
+</script>
+
+</head>
+
+<body>
+
+<div id="painel">
+
+<button id="shuffle">
+Embaralhar
+</button>
+
+<select id="tema">
+
+<option value="classico">
+Clássico
+</option>
+
+<option value="neon">
+Neon
+</option>
+
+<option value="escuro">
+Escuro
+</option>
+
+</select>
+
+<div id="contador">
+Movimentos: 0
+</div>
+
+<div>
+U D F B R L
+</div>
+
+</div>
+
+<script type="module" src="./script.js"></script>
+
+</body>
+
+</html>
