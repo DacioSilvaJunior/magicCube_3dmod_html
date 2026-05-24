@@ -12,8 +12,8 @@ const cubos=[];
 
 const estado={
 
-movimentos:0,
-animando:false
+    movimentos:0,
+    animando:false
 
 };
 
@@ -26,42 +26,39 @@ const scene=new THREE.Scene();
 scene.background=
 new THREE.Color(0x222222);
 
-const camera=
-new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    1000
 );
 
 camera.position.set(
-6,
-6,
-8
+    6,
+    6,
+    8
 );
 
-const renderer=
-new THREE.WebGLRenderer({
-antialias:true
+const renderer = new THREE.WebGLRenderer({
+    antialias:true
 });
 
 renderer.setSize(
-window.innerWidth,
-window.innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 document.body.appendChild(
-renderer.domElement
+    renderer.domElement
 );
 
 /////////////////////////
 // controles
 /////////////////////////
 
-const controls=
-new OrbitControls(
-camera,
-renderer.domElement
+const controls = new OrbitControls(
+    camera,
+    renderer.domElement
 );
 
 controls.enableDamping=true;
@@ -71,22 +68,21 @@ controls.enableDamping=true;
 /////////////////////////
 
 scene.add(
-new THREE.AmbientLight(
-0xffffff,
-2
-)
+    new THREE.AmbientLight(
+        0xffffff,
+        2
+    )
 );
 
-const luz=
-new THREE.DirectionalLight(
-0xffffff,
-2
+const luz = new THREE.DirectionalLight(
+    0xffffff,
+    2
 );
 
 luz.position.set(
-10,
-10,
-10
+    10,
+    10,
+    10
 );
 
 scene.add(luz);
@@ -97,65 +93,65 @@ scene.add(luz);
 
 for(let x=-1;x<=1;x++){
 
-for(let y=-1;y<=1;y++){
+    for(let y=-1;y<=1;y++){
 
-for(let z=-1;z<=1;z++){
+        for(let z=-1;z<=1;z++){
 
-const materiais=[
+            const materiais=[
 
-new THREE.MeshBasicMaterial({
-color:x===1?0xff0000:0x333333
-}),
+                new THREE.MeshBasicMaterial({
+                    color:x===1?0xff0000:0x333333
+                }),
 
-new THREE.MeshBasicMaterial({
-color:x===-1?0xff8800:0x333333
-}),
+                new THREE.MeshBasicMaterial({
+                    color:x===-1?0xff8800:0x333333
+                }),
 
-new THREE.MeshBasicMaterial({
-color:y===1?0xffffff:0x333333
-}),
+                new THREE.MeshBasicMaterial({
+                    color:y===1?0xffffff:0x333333
+                }),
 
-new THREE.MeshBasicMaterial({
-color:y===-1?0xffff00:0x333333
-}),
+                new THREE.MeshBasicMaterial({
+                    color:y===-1?0xffff00:0x333333
+                }),
 
-new THREE.MeshBasicMaterial({
-color:z===1?0x00ff00:0x333333
-}),
+                new THREE.MeshBasicMaterial({
+                    color:z===1?0x00ff00:0x333333
+                }),
 
-new THREE.MeshBasicMaterial({
-color:z===-1?0x0000ff:0x333333
-})
+                new THREE.MeshBasicMaterial({
+                    color:z===-1?0x0000ff:0x333333
+                })
 
-];
+            ];
 
-const cubo=
-new THREE.Mesh(
-new THREE.BoxGeometry(
-0.95,
-0.95,
-0.95
-),
-materiais
-);
+            const cubo =
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        0.95,
+                        0.95,
+                        0.95
+                    ),
+                materiais
+                );
 
-cubo.position.set(
-x,
-y,
-z
-);
+            cubo.position.set(
+                x,
+                y,
+                z
+            );
 
-cubos.push(
-cubo
-);
+            cubos.push(
+                cubo
+            );
 
-scene.add(
-cubo
-);
+            scene.add(
+                cubo
+            );
 
-}
+        }
 
-}
+    }
 
 }
 
@@ -163,79 +159,68 @@ cubo
 // girar
 /////////////////////////
 
-function girarFace(
-eixo,
-valor
-){
+function girarFace(eixo, valor, direcao){
 
-if(
-estado.animando
-)return;
+    if(
+        estado.animando
+    )return;
 
-estado.animando=true;
+    estado.animando=true;
 
-const grupo=
-new THREE.Group();
+    const grupo = new THREE.Group();
 
-scene.add(
-grupo
-);
+    scene.add(
+        grupo
+    );
 
-const face=
-cubos.filter(
-c=>Math.round(
-c.position[eixo]
-)==valor
-);
+    const face = cubos.filter(
+        c=>Math.round(
+        c.position[eixo]
+        )==valor
+    );
 
-face.forEach(
-c=>grupo.attach(c)
-);
+    face.forEach(
+        c=>grupo.attach(c)
+    );
 
-let angulo=0;
+    let angulo=0;
+    let velocidade = 0.05;
 
-function animar(){
+    function animar(){
 
-angulo+=0.05;
+        angulo += velocidade;
 
-grupo.rotation[eixo]=angulo;
+        if(angulo < Math.PI/2){
 
-if(
-angulo<
-Math.PI/2
-){
+            grupo.rotation[eixo] = angulo * direcao;
 
-requestAnimationFrame(
-animar
-);
+            requestAnimationFrame(
+                animar
+            );
 
-}else{
+        } else{
 
-face.forEach(
-c=>scene.attach(c)
-);
+            face.forEach(
+                c=>scene.attach(c)
+            );
 
-scene.remove(
-grupo
-);
+            scene.remove(
+                grupo
+            );
 
-estado.animando=false;
+            estado.animando=false;
 
-estado.movimentos++;
+            estado.movimentos++;
 
-document
-.getElementById(
-"contador"
-)
-.innerHTML=
-"Movimentos: "+
-estado.movimentos;
+            document.getElementById(
+                "contador"
+            ).innerHTML = "Movimentos: "+ estado.movimentos;
 
-}
+        }
 
-}
+    }
 
-animar();
+    animar();
 
 }
 
@@ -244,70 +229,127 @@ animar();
 /////////////////////////
 
 document.addEventListener(
-"keydown",
-e=>{
+    "keydown",
+    e=>{
 
-switch(
-e.key.toLowerCase()
-){
+        switch(e.key.toLowerCase()){
 
-case "u":
+            case "a":
 
-girarFace(
-"y",
-1
-);
+                girarFace(
+                    "y",
+                    1,
+                    1
+                );
 
-break;
+                break;
 
-case "d":
+            case "s":
 
-girarFace(
-"y",
--1
-);
+                girarFace(
+                    "y",
+                    0,
+                    1
+                );
 
-break;
+                break;
 
-case "f":
+            case "d":
 
-girarFace(
-"z",
-1
-);
+                girarFace(
+                    "y",
+                    -1,
+                    1
+                );
 
-break;
+                break;
 
-case "b":
+            case "j":
 
-girarFace(
-"z",
--1
-);
+                girarFace(
+                    "x",
+                    -1,
+                    1
+                );
 
-break;
+                break;
 
-case "r":
+            case "k":
 
-girarFace(
-"x",
-1
-);
+                girarFace(
+                    "x",
+                    0,
+                    1
+                );
 
-break;
+                break;
 
-case "l":
+            case "l":
 
-girarFace(
-"x",
--1
-);
+                girarFace(
+                    "x",
+                    1,
+                    1
+                );
 
-break;
+                break;
+            
+            case "q":
+                girarFace(
+                    "y",
+                    1,
+                    -1
+                );
 
-}
+                break;
 
-}
+            case "w":
+                girarFace(
+                    "y",
+                    0,
+                    -1
+                );
+
+                break;
+
+            case "e":
+                girarFace(
+                    "y",
+                    -1,
+                    -1
+                );
+
+                break;
+
+            case "u":
+                girarFace(
+                    "x",
+                    1,
+                    -1
+                );
+
+                break;
+
+            case "i":
+                girarFace(
+                    "x",
+                    0,
+                    -1
+                );
+
+                break;
+
+            case "o":
+                girarFace(
+                    "x",
+                    -1,
+                    -1
+                );
+
+                break;
+        }
+
+    }
 );
 
 /////////////////////////
@@ -316,16 +358,16 @@ break;
 
 function animate(){
 
-requestAnimationFrame(
-animate
-);
+    requestAnimationFrame(
+        animate
+    );
 
-controls.update();
+    controls.update();
 
-renderer.render(
-scene,
-camera
-);
+    renderer.render(
+        scene,
+        camera
+    );
 
 }
 
