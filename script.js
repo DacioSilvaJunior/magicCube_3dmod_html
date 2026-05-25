@@ -5,20 +5,19 @@ import { OrbitControls }
 from "three/addons/controls/OrbitControls.js";
 
 /////////////////////////
-// variáveis
+// Variáveis
 /////////////////////////
 
 const cubos=[];
 
 const estado={
-
     movimentos:0,
+    embaralhos:0,
     animando:false
-
 };
 
 /////////////////////////
-// cena
+// Cena
 /////////////////////////
 
 const scene=new THREE.Scene();
@@ -53,7 +52,7 @@ document.body.appendChild(
 );
 
 /////////////////////////
-// controles
+// Controles
 /////////////////////////
 
 const controls = new OrbitControls(
@@ -64,7 +63,7 @@ const controls = new OrbitControls(
 controls.enableDamping=true;
 
 /////////////////////////
-// luz
+// Iluminação
 /////////////////////////
 
 scene.add(
@@ -88,7 +87,7 @@ luz.position.set(
 scene.add(luz);
 
 /////////////////////////
-// cubinhos
+// Cubinhos
 /////////////////////////
 
 for(let x=-1;x<=1;x++){
@@ -100,27 +99,27 @@ for(let x=-1;x<=1;x++){
             const materiais=[
 
                 new THREE.MeshBasicMaterial({
-                    color:x===1?0xff0000:0x333333
+                    color: x === 1 ? 0xff0000 : 0x333333
                 }),
 
                 new THREE.MeshBasicMaterial({
-                    color:x===-1?0xff8800:0x333333
+                    color: x === -1 ? 0xff8800 : 0x333333
                 }),
 
                 new THREE.MeshBasicMaterial({
-                    color:y===1?0xffffff:0x333333
+                    color: y === 1 ? 0xffffff :  0x333333
                 }),
 
                 new THREE.MeshBasicMaterial({
-                    color:y===-1?0xffff00:0x333333
+                    color: y === -1 ? 0xffff00 : 0x333333
                 }),
 
                 new THREE.MeshBasicMaterial({
-                    color:z===1?0x00ff00:0x333333
+                    color: z === 1 ? 0x00ff00 : 0x333333
                 }),
 
                 new THREE.MeshBasicMaterial({
-                    color:z===-1?0x0000ff:0x333333
+                    color: z === -1 ? 0x0000ff : 0x333333
                 })
 
             ];
@@ -156,7 +155,7 @@ for(let x=-1;x<=1;x++){
 }
 
 /////////////////////////
-// girar
+// Rotações
 /////////////////////////
 
 function girarFace(eixo, valor, direcao){
@@ -190,7 +189,7 @@ function girarFace(eixo, valor, direcao){
 
         angulo += velocidade;
 
-        if(angulo < Math.PI/2){
+        if(angulo <= Math.PI/2){
 
             grupo.rotation[eixo] = angulo * direcao;
 
@@ -198,24 +197,39 @@ function girarFace(eixo, valor, direcao){
                 animar
             );
 
-        } else{
+        } else {
 
-            face.forEach(
-                c=>scene.attach(c)
-            );
+            // força rotação exata de 90°
+            grupo.rotation[eixo] = (Math.PI / 2) * direcao;
 
-            scene.remove(
-                grupo
-            );
+            // atualiza matrizes
+            grupo.updateMatrixWorld(true);
 
-            estado.animando=false;
+            face.forEach(c => {
+
+                // devolve ao scene mantendo transformações
+                scene.attach(c);
+
+                // arredonda posição
+                c.position.x = Math.round(c.position.x);
+                c.position.y = Math.round(c.position.y);
+                c.position.z = Math.round(c.position.z);
+
+                // arredonda rotação
+                c.rotation.x = Math.round(c.rotation.x / (Math.PI/2)) * (Math.PI/2);
+                c.rotation.y = Math.round(c.rotation.y / (Math.PI/2)) * (Math.PI/2);
+                c.rotation.z = Math.round(c.rotation.z / (Math.PI/2)) * (Math.PI/2);
+
+            });
+
+            scene.remove(grupo);
+
+            estado.animando = false;
 
             estado.movimentos++;
 
-            document.getElementById(
-                "contador"
-            ).innerHTML = "Movimentos: "+ estado.movimentos;
-
+            document.getElementById("contador").innerHTML =
+                "Movimentos: " + estado.movimentos;
         }
 
     }
@@ -225,7 +239,7 @@ function girarFace(eixo, valor, direcao){
 }
 
 /////////////////////////
-// teclado
+// Inputs
 /////////////////////////
 
 document.addEventListener(
@@ -235,116 +249,62 @@ document.addEventListener(
         switch(e.key.toLowerCase()){
 
             case "a":
-
-                girarFace(
-                    "y",
-                    1,
-                    1
-                );
+                girarFace("y", 1, 1);
 
                 break;
 
             case "s":
-
-                girarFace(
-                    "y",
-                    0,
-                    1
-                );
+                girarFace("y", 0, 1);
 
                 break;
 
             case "d":
-
-                girarFace(
-                    "y",
-                    -1,
-                    1
-                );
+                girarFace("y", -1, 1);
 
                 break;
 
             case "j":
-
-                girarFace(
-                    "x",
-                    -1,
-                    1
-                );
+                girarFace("x", -1, 1);
 
                 break;
 
             case "k":
-
-                girarFace(
-                    "x",
-                    0,
-                    1
-                );
+                girarFace("x", 0, 1);
 
                 break;
 
             case "l":
-
-                girarFace(
-                    "x",
-                    1,
-                    1
-                );
+                girarFace("x", 1, 1);
 
                 break;
             
             case "q":
-                girarFace(
-                    "y",
-                    1,
-                    -1
-                );
+                girarFace("y", 1, -1);
 
                 break;
 
             case "w":
-                girarFace(
-                    "y",
-                    0,
-                    -1
-                );
+                girarFace("y", 0, -1);
 
                 break;
 
             case "e":
-                girarFace(
-                    "y",
-                    -1,
-                    -1
-                );
-
-                break;
-
-            case "u":
-                girarFace(
-                    "x",
-                    1,
-                    -1
-                );
-
-                break;
-
-            case "i":
-                girarFace(
-                    "x",
-                    0,
-                    -1
-                );
+                girarFace("y", -1, -1);
 
                 break;
 
             case "o":
-                girarFace(
-                    "x",
-                    -1,
-                    -1
-                );
+                girarFace("x", 1, -1);
+
+                break;
+
+            case "i":
+                girarFace("x", 0, -1);
+
+                break;
+
+            case "u":
+                girarFace("x", -1, -1);
 
                 break;
         }
@@ -352,8 +312,140 @@ document.addEventListener(
     }
 );
 
+
 /////////////////////////
-// render
+// Shuffle
+/////////////////////////
+
+async function shuffle(){
+    if(estado.animando) return;
+
+    const movimentos = [
+
+        // eixo X
+        { eixo: "x", valor: -1 },
+        { eixo: "x", valor: 0 },
+        { eixo: "x", valor: 1 },
+
+        // eixo Y
+        { eixo: "y", valor: -1 },
+        { eixo: "y", valor: 0 },
+        { eixo: "y", valor: 1 },
+
+        // eixo Z
+        { eixo: "z", valor: -1 },
+        { eixo: "z", valor: 0 },
+        { eixo: "z", valor: 1 }
+
+    ];
+
+    for(let i = 0; i < 5; i++){
+
+        const movimento = movimentos[Math.floor(Math.random() * movimentos.length)];
+
+        const direcao = Math.random() > 0.5 ? 1 : -1;
+
+        await girarFaceAsync(movimento.eixo, movimento.valor, direcao);
+
+    }
+
+}
+
+window.shuffle = shuffle;
+
+function girarFaceAsync(eixo, valor, direcao){
+
+    return new Promise(resolve => {
+
+        if(estado.animando){
+            resolve();
+            return;
+        }
+
+        estado.animando = true;
+
+        const grupo = new THREE.Group();
+
+        scene.add(grupo);
+
+        const face = cubos.filter(c => Math.abs(c.position[eixo] - valor) < 0.1);
+
+        face.forEach(c => grupo.attach(c));
+
+        let angulo = 0;
+
+        const velocidade = 0.05;
+
+        function animar(){
+
+            angulo = Math.min(angulo + velocidade,Math.PI / 2);
+
+            grupo.rotation[eixo] =
+                angulo * direcao;
+
+            if(angulo < Math.PI / 2){
+
+                requestAnimationFrame(animar);
+
+            } else {
+
+                grupo.rotation[eixo] =
+                    (Math.PI / 2) * direcao;
+
+                grupo.updateMatrixWorld(true);
+
+                face.forEach(c => {
+
+                    scene.attach(c);
+
+                    c.position.x =
+                        Math.round(c.position.x);
+
+                    c.position.y =
+                        Math.round(c.position.y);
+
+                    c.position.z =
+                        Math.round(c.position.z);
+
+                    c.rotation.x =
+                        Math.round(
+                            c.rotation.x / (Math.PI/2)
+                        ) * (Math.PI/2);
+
+                    c.rotation.y =
+                        Math.round(
+                            c.rotation.y / (Math.PI/2)
+                        ) * (Math.PI/2);
+
+                    c.rotation.z =
+                        Math.round(
+                            c.rotation.z / (Math.PI/2)
+                        ) * (Math.PI/2);
+
+                });
+
+                scene.remove(grupo);
+
+                estado.animando = false;
+
+                estado.embaralhos++;
+
+                document.getElementById("embaralhos").innerHTML = "Embaralhos: " + estado.embaralhos;
+
+                resolve();
+
+            }
+
+        }
+
+        animar();
+
+    });
+
+}
+
+/////////////////////////
+// Render
 /////////////////////////
 
 function animate(){
