@@ -16,6 +16,63 @@ const estado={
     animando:false
 };
 
+const palettes = {
+    padrao: {
+        xPos: 0xff0000,
+        xNeg: 0xff8800,
+        yPos: 0xffffff,
+        yNeg: 0xffff00,
+        zPos: 0x00ff00,
+        zNeg: 0x0000ff
+    },
+    neon: {
+        xPos: 0xff4d6d,
+        xNeg: 0xff9f1c,
+        yPos: 0xe0e0ff,
+        yNeg: 0xffdd57,
+        zPos: 0x3cffb5,
+        zNeg: 0x4d4dff
+    },
+    pastel: {
+        xPos: 0xffa3a3,
+        xNeg: 0xffc27b,
+        yPos: 0xf4f4f9,
+        yNeg: 0xfff1a8,
+        zPos: 0xa7ffb6,
+        zNeg: 0xa9d4ff
+    }
+};
+
+function getPaletteColors(name){
+    return palettes[name] || palettes.padrao;
+}
+
+function createCubeMaterials(x, y, z){
+    const palA = getPaletteColors(document.getElementById("paletteA")?.value);
+    const palB = getPaletteColors(document.getElementById("paletteB")?.value);
+
+    return [
+        new THREE.MeshBasicMaterial({
+            color: x === 1 ? palA.xPos : 0x333333
+        }),
+        new THREE.MeshBasicMaterial({
+            color: x === -1 ? palA.xNeg : 0x333333
+        }),
+        new THREE.MeshBasicMaterial({
+            color: y === 1 ? palA.yPos : 0x333333
+        }),
+        new THREE.MeshBasicMaterial({
+            color: y === -1 ? palA.yNeg : 0x333333
+        }),
+        new THREE.MeshBasicMaterial({
+            color: z === 1 ? palB.zPos : 0x333333
+        }),
+        new THREE.MeshBasicMaterial({
+            color: z === -1 ? palB.zNeg : 0x333333
+        })
+    ];
+}
+
 /////////////////////////
 // Cena
 /////////////////////////
@@ -96,33 +153,7 @@ for(let x=-1;x<=1;x++){
 
         for(let z=-1;z<=1;z++){
 
-            const materiais=[
-
-                new THREE.MeshBasicMaterial({
-                    color: x === 1 ? 0xff0000 : 0x333333
-                }),
-
-                new THREE.MeshBasicMaterial({
-                    color: x === -1 ? 0xff8800 : 0x333333
-                }),
-
-                new THREE.MeshBasicMaterial({
-                    color: y === 1 ? 0xffffff :  0x333333
-                }),
-
-                new THREE.MeshBasicMaterial({
-                    color: y === -1 ? 0xffff00 : 0x333333
-                }),
-
-                new THREE.MeshBasicMaterial({
-                    color: z === 1 ? 0x00ff00 : 0x333333
-                }),
-
-                new THREE.MeshBasicMaterial({
-                    color: z === -1 ? 0x0000ff : 0x333333
-                })
-
-            ];
+            const materiais = createCubeMaterials(x, y, z);
 
             const cubo =
                 new THREE.Mesh(
@@ -352,6 +383,32 @@ async function shuffle(){
 }
 
 window.shuffle = shuffle;
+
+function refreshCubeColors(){
+    const palA = getPaletteColors(document.getElementById("paletteA").value);
+    const palB = getPaletteColors(document.getElementById("paletteB").value);
+
+    cubos.forEach(c => {
+        const x = Math.round(c.position.x);
+        const y = Math.round(c.position.y);
+        const z = Math.round(c.position.z);
+
+        c.material[0].color.set(x === 1 ? palA.xPos : 0x333333);
+        c.material[1].color.set(x === -1 ? palA.xNeg : 0x333333);
+        c.material[2].color.set(y === 1 ? palA.yPos : 0x333333);
+        c.material[3].color.set(y === -1 ? palA.yNeg : 0x333333);
+        c.material[4].color.set(z === 1 ? palB.zPos : 0x333333);
+        c.material[5].color.set(z === -1 ? palB.zNeg : 0x333333);
+    });
+}
+
+const paletteASelect = document.getElementById("paletteA");
+const paletteBSelect = document.getElementById("paletteB");
+
+paletteASelect.addEventListener("change", refreshCubeColors);
+paletteBSelect.addEventListener("change", refreshCubeColors);
+
+refreshCubeColors();
 
 function girarFaceAsync(eixo, valor, direcao){
 
